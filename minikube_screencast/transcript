@@ -1,0 +1,96 @@
+# Hello all we are going to create a local k8s cluster for dev using Minikube
+
+# There are some prerequisites
+
+# For OS X, install xhyve driver, VirtualBox, or VMware Fusion, then Kubectl and Minkube
+
+# For Windows, install VirtualBox or Hyper-V then Kubectl and Minkube
+
+# For Linux, install VirtualBox or KVM then Kubectl and Minkube
+
+# We are going to use this Dockerfile
+
+cat Dockerfile 
+
+# this is a busybox image using a httpd webserver
+# this is the content of the index.html page
+
+cat index.html
+
+# Build the image:
+
+docker build -t eon01/hello-world-web-server .
+
+# Let’s run the container to test it:
+
+docker run -d --name webserver -p 8000:8000 eon01/hello-world-web-server
+
+docker ps
+
+# Let’s commit the image and upload it to the public Docker Hub. You can use your own private registry
+
+docker commit webserver
+
+docker push eon01/hello-world-web-server
+
+# Remove the container since we will use it with Minkube
+
+docker rm -f webserver
+
+# Time to start minikube:
+
+minkube start
+
+
+Check the status:
+minikube status
+
+
+# We are running a single node:
+kubectl get node
+
+# Run the webserver:
+kubectl run webserver --image=eon01/hello-world-web-server --port=8000
+
+# A webserver should have it’s port exposed:
+kubectl expose deployment webserver --type=NodePort
+
+# In order to get the content of the web page using this port:
+minikube service hello-minikube --url
+curl http://
+
+# To show a summary of the running cluster run:
+kubectl cluster-info
+
+# For more details:
+kubectl cluster-info dump
+
+# We can also list the pods using:
+kubectl get pods
+
+# And to access to the dashboard use:
+minikube dashboard
+
+# If you would like to access the frontend of the web application type:
+kubectl proxy
+
+# If we want to execute a command inside the container, get the pod id using:
+kubetctl get pods
+
+# Then use it like :
+kubectl exec webserver <>  -it -- /bin/sh
+
+# To finish, delete all deployments, services and pods:
+kubectl delete deployments --all
+kubectl delete pods --all
+
+
+# And stop Minikube
+minikube stop
+
+# I hope you enjoyed this
+
+
+
+
+
